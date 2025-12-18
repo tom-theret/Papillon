@@ -1,16 +1,16 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { FlatList, View } from "react-native";
 import { useTheme } from "@react-navigation/native";
-import { t } from "i18next";
-
-import Typography from "@/ui/components/Typography";
-import AnimatedPressable from "@/ui/components/AnimatedPressable";
-import { useSettingsStore } from "@/stores/settings";
-import { Colors, AppColors } from "@/utils/colors";
-import adjust from "@/utils/adjustColor";
 import { ImpactFeedbackStyle } from "expo-haptics";
+import { t } from "i18next";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Dimensions, FlatList, View } from "react-native";
 
-export { Colors, AppColors };
+import { useSettingsStore } from "@/stores/settings";
+import AnimatedPressable from "@/ui/components/AnimatedPressable";
+import Typography from "@/ui/components/Typography";
+import adjust from "@/utils/adjustColor";
+import { AppColors, Colors } from "@/utils/colors";
+
+export { AppColors, Colors };
 
 interface ColorSelectorProps {
   mainColor: string;
@@ -97,10 +97,17 @@ const AppColorsSelector = React.memo<AppColorsSelectorProps>(function AppColorsS
   const [selectedColor, setSelectedColor] = useState<string>(defaultColorData.mainColor);
   const [color, setColor] = useState<Colors>(settingsStore.colorSelected || Colors.PINK);
 
+  const isLandscape = Dimensions.get("window").width > Dimensions.get("window").height;
+
+  const itemHorizontalPadding = 18; // padding horizontal pour éviter le rognage
+
   const itemWidth = useMemo(() => {
-    if (containerWidth === 0) return 100;
+    if (containerWidth === 0) { return 100; }
+    if (isLandscape) {
+      return (containerWidth - itemHorizontalPadding * 2 - 6 * AppColors.length) / AppColors.length;
+    }
     return (containerWidth - 36) / 3;
-  }, [containerWidth]);
+  }, [containerWidth, isLandscape]);
 
   useEffect(() => {
     const colorData = AppColors.find(color => color.colorEnum === settingsStore.colorSelected) || AppColors[0];
@@ -125,11 +132,14 @@ const AppColorsSelector = React.memo<AppColorsSelectorProps>(function AppColorsS
     />
   ), [selectedColor, theme.dark, handleColorPress, itemWidth]);
 
+  const numColumns = isLandscape ? AppColors.length : 3;
+
   return (
     <FlatList
       scrollEnabled={false}
       data={AppColors}
-      numColumns={3}
+      numColumns={numColumns}
+      key={`flatlist-${numColumns}`}
       renderItem={renderItem}
       keyExtractor={(item) => item.colorEnum.toString()}
       showsHorizontalScrollIndicator={false}
@@ -140,6 +150,7 @@ const AppColorsSelector = React.memo<AppColorsSelectorProps>(function AppColorsS
       contentContainerStyle={{
         justifyContent: "center",
         alignItems: "center",
+        paddingHorizontal: itemHorizontalPadding,
       }}
       columnWrapperStyle={{
         justifyContent: "space-between",
@@ -147,7 +158,6 @@ const AppColorsSelector = React.memo<AppColorsSelectorProps>(function AppColorsS
       }}
       style={{
         width: "100%",
-        overflow: "hidden"
       }}
       removeClippedSubviews
       maxToRenderPerBatch={6}
