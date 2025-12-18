@@ -1,9 +1,10 @@
-import React, { memo } from 'react';
-import { t } from "i18next";
 import { Papicons } from '@getpapillon/papicons';
+import { t } from "i18next";
+import React, { memo } from 'react';
+
 import { Dynamic } from "@/ui/components/Dynamic";
-import Stack from "@/ui/components/Stack";
 import Icon from "@/ui/components/Icon";
+import Stack from "@/ui/components/Stack";
 import Typography from "@/ui/components/Typography";
 
 export const EmptyCalendar = memo(() => (
@@ -11,6 +12,8 @@ export const EmptyCalendar = memo(() => (
     <Stack
       hAlign="center"
       vAlign="center"
+      flex
+      style={{ width: "100%" }}
       margin={16}
     >
       <Icon papicon opacity={0.5} size={32} style={{ marginBottom: 3 }}>
@@ -25,3 +28,5 @@ export const EmptyCalendar = memo(() => (
     </Stack>
   </Dynamic>
 ));
+
+EmptyCalendar.displayName = 'EmptyCalendar';
